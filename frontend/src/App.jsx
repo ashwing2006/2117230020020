@@ -43,7 +43,10 @@ function App() {
       })
 
   }
-
+async function deleteNotification(id) {
+  await fetch(`http://localhost:3001/notifications/${id}`, { method: "DELETE" })
+  fetchNotifications()
+}
   return (
     <div>
 
@@ -78,6 +81,9 @@ function App() {
           <div key={item.id}>
             <p>{item.title}</p>
             <p>{item.type}</p>
+            <button onClick={() => deleteNotification(item.id)}>
+              Delete
+            </button>
             <hr />
           </div>
         ))

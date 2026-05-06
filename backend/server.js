@@ -8,7 +8,7 @@ app.use(cors())
 app.use(express.json())
 app.use(logger)
 
-const notifications = [
+let notifications = [
   {
     id: 1,
     title: "Placement Drive",
@@ -45,6 +45,27 @@ app.post("/notifications", (req, res) => {
   notifications.push(newNotification)
   res.status(201).json({
     message: "Notification added"
+  })
+
+})
+app.post("/notifications", (req, res) => {
+  const { title, type } = req.body
+  notifications.push({
+    id: notifications.length + 1,
+    title,
+    type
+  })
+   res.status(201).json({ message: "Notification added" })
+})
+
+app.delete("/notifications/:id", (req, res) => {
+
+  const id = Number(req.params.id)
+
+  notifications = notifications.filter(n => n.id !== id)
+
+  res.json({
+    message: "Notification deleted"
   })
 
 })
