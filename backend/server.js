@@ -1,25 +1,19 @@
 const express = require("express")
 const cors = require("cors")
 const logger = require("./logger")
-
+const db = require("./db")
 const app = express()
 
 app.use(cors())
 app.use(express.json())
 app.use(logger)
+app.get("/notifications", (req, res) => {
+  db.query("SELECT * FROM notifications", (err, result) => {
+    if (err) return res.status(500).json(err)
+    res.json(result)
+  })
+})
 
-let notifications = [
-  {
-    id: 1,
-    title: "Placement Drive",
-    type: "Placement"
-  },
-  {
-    id: 2,
-    title: "Semester Results",
-    type: "Result"
-  }
-]
 
 app.get("/", (req, res) => {
   res.json({
@@ -37,35 +31,23 @@ app.listen(PORT, () => {
   console.log(`Server running on ${PORT}`)
 })
 app.post("/notifications", (req, res) => {
-  const newNotification = {
-    id: notifications.length + 1,
-    title: req.body.title,
-    type: req.body.type
-  }
-  notifications.push(newNotification)
-  res.status(201).json({
-    message: "Notification added"
-  })
-
-})
-app.post("/notifications", (req, res) => {
   const { title, type } = req.body
-  notifications.push({
-    id: notifications.length + 1,
-    title,
-    type
+
+  db.query("INSERT INTO notifications (title, type) VALUES (?, ?)", [title, type], (err) => {
+    if (err) {
+      console.log(err)
+      return res.status(500).json(err)
+    }
+    res.status(201).json({ message: "Added" })
   })
-   res.status(201).json({ message: "Notification added" })
 })
+
 
 app.delete("/notifications/:id", (req, res) => {
+  const id = req.params.id
 
-  const id = Number(req.params.id)
-
-  notifications = notifications.filter(n => n.id !== id)
-
-  res.json({
-    message: "Notification deleted"
+  db.query("DELETE FROM notifications WHERE id = ?", [id], (err) => {
+    if (err) return res.status(500).json(err)
+    res.json({ message: "Deleted" })
   })
-
 })
