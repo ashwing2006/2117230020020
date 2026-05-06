@@ -36,3 +36,15 @@ const PORT = 3001
 app.listen(PORT, () => {
   console.log(`Server running on ${PORT}`)
 })
+app.post("/notifications", (req, res) => {
+  const newNotification = {
+    id: notifications.length + 1,
+    title: req.body.title,
+    type: req.body.type
+  }
+  notifications.push(newNotification)
+  res.status(201).json({
+    message: "Notification added"
+  })
+
+})
